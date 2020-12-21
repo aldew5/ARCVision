@@ -25,7 +25,7 @@ class Marker(object):
       
         
 
-    def display(self):
+    def display(self, video_frame, image):
         augment(self.label, frame, corners, (width, height), video_frame,\
                 (frame_width, frame_height), image)
 
@@ -45,12 +45,14 @@ class Variable(Marker):
         text = self.name + " = " + self.value
 
         
-        cv2.putText(blank_image, text, bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0)\
+        cv2.putText(blank_image, text, bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
                     2)
         
+        Marker.display(blank_image, frame)
+
+    def print(self):
+        print(self.name, ":", self.value)
     
-        augment(self.label, frame, corners, (width, height), blank_image,\
-                (frame_width, frame_height), frame)
 
     
     
