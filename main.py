@@ -16,6 +16,19 @@ parameters = aruco.DetectorParameters_create()
 rect = np.zeros((4, 2), dtype="float32")
 detected = {}
 
+blank = np.zeros((200, 200, 3), np.uint8)
+blank[:, 0:200] = (255, 255, 255)
+
+font = cv2.FONT_HERSHEY_SIMPLEX
+bc = (10, 100)
+text = "HI " + " = " + " 5"
+
+
+cv2.putText(blank, text, bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
+                    2)
+        
+blank_frame = cv2.resize(blank, (200, 200))
+
 for i in range(50):
     detected[i] = False
 
@@ -35,18 +48,22 @@ while (cap.isOpened()):
 
     if (len(corners)):
         ids2 = ids.flatten()
+        #augment(0, frame, corners, (200, 200), blank_frame,\
+                        #(frame_width, frame_height), img1)
         
         label = -1
         for id in ids2:
             label += 1
             if (not detected[id]):
-                print("label is ", label)
+                #print("label is ", label)
                 var = Variable(img1, label, frame, corners, frame_width, frame_height)
                 variables.append(var)
                 detected[id] = True
+        #variables[0].print()
                 
         for var in variables:
-            var.print()
+            #var.print()
+            var.update(img1, frame, corners)
             var.display()
         
         
@@ -58,4 +75,6 @@ while (cap.isOpened()):
     
 cap.release()
 cv2.destroyAllWindows()
+
+
 
