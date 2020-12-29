@@ -4,6 +4,7 @@ from cv2 import aruco
 from augment import four_point_transform
 from augment import augment
 from markers import Variable
+from markers import Operator
 
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -16,23 +17,11 @@ parameters = aruco.DetectorParameters_create()
 rect = np.zeros((4, 2), dtype="float32")
 detected = {}
 
-blank = np.zeros((200, 200, 3), np.uint8)
-blank[:, 0:200] = (255, 255, 255)
-
-font = cv2.FONT_HERSHEY_SIMPLEX
-bc = (10, 100)
-text = "HI " + " = " + " 5"
-
-
-cv2.putText(blank, text, bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
-                    2)
-        
-blank_frame = cv2.resize(blank, (200, 200))
-
 for i in range(50):
     detected[i] = False
 
 variables = []
+operators = []
 
 
 while (cap.isOpened()):
@@ -55,16 +44,25 @@ while (cap.isOpened()):
         for id in ids2:
             label += 1
             if (not detected[id]):
-                #print("label is ", label)
-                var = Variable(img1, label, frame, corners, frame_width, frame_height)
-                variables.append(var)
+                if (id == 2):
+                    oper = Operator(img1, label, frame, corners, frame_width, frame_height)
+                    operators.append(oper)
+                else:
+                    #print("label is ", label)
+                    var = Variable(img1, label, frame, corners, frame_width, frame_height)
+                    variables.append(var)
                 detected[id] = True
         #variables[0].print()
                 
         for var in variables:
-            #var.print()
+            print(len(variables))
             var.update(img1, frame, corners)
             var.display()
+            
+        for oper in operators:
+            #print("OPERATORS", len(operators))
+            oper.update(img1, frame, corners)
+            oper.display()
         
         
     cv2.imshow("augmented", img1)
@@ -75,6 +73,4 @@ while (cap.isOpened()):
     
 cap.release()
 cv2.destroyAllWindows()
-
-
 
