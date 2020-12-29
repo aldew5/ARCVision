@@ -11,4 +11,5 @@ clock = pg.time.Clock()
 # One being the intro screen ?
 
 def drawWindow():
+    pass
     
