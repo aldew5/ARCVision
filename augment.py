@@ -48,10 +48,15 @@ def augment(eindex, frame, corners, image_dim, video_frame, frame_dim, image):
     width, height = image_dim[0], image_dim[1]
     frame_width, frame_height = frame_dim[0], frame_dim[1]
     
-    (warp, M) = four_point_transform(frame, np.array([corners[eindex][0][0],
+    try:
+        (warp, M) = four_point_transform(frame, np.array([corners[eindex][0][0],
                                                 corners[eindex][0][1],
                                                 corners[eindex][0][2],
-                                            corners[eindex][0][3]]), width, height)
+                                                corners[eindex][0][3]]), width, height)
+    except IndexError:
+        return None
+        
+        
     cv2.imshow('warp', warp)
     
     # compute the inverse
