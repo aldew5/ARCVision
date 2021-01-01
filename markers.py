@@ -39,7 +39,7 @@ class Variable(Marker):
         
         if (type(self.value) == int or type(self.value) == float):
             self.type = "num"
-        else if (type(self.value) == str):
+        elif(type(self.value) == str):
             self.type = "string"
         
         
@@ -64,6 +64,9 @@ class Variable(Marker):
 
     def print(self):
         print(self.name, ":", self.value)
+        
+    def set_value(self, value):
+        self.value = value 
     
     
     
@@ -78,7 +81,7 @@ class Operator(Marker):
         blank[:, 0:200] = (255, 255, 255)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
-        bc = (10, 100)
+        bc = (100, 100)
         
         cv2.putText(blank, self.oper, bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
                     2)
@@ -90,16 +93,17 @@ class Operator(Marker):
     def compute(self, var1, var2=None, value=None):
         if (var2 == None):
             if (var1.type == "num" and (type(value) == int or type(value) == float)):
-                var1.value += value
-            else if (var1.type == "string" and type(value) == str):
-                var1.value += value
+                var1.set_value(var1.value + value)
+          
+            elif (var1.type == "string" and type(value) == str):
+                var1.set_value(var1.value + value)
             else:
                 print("ERROR")
                 print("Incompatible data types")
         
-        else if (value == None):
+        elif(value == None):
             if (var1.type == var2.type):
-                var1.value += var2.value
+                var1.set_value(var1.value + var2.value)
             else:
                 print("ERROR")
                 print("Incompatible data types")
@@ -111,6 +115,3 @@ class Loop(Marker):
     
     
             
-        
-        
-    
