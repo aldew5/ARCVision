@@ -5,6 +5,7 @@ from augment import four_point_transform
 from augment import augment
 from markers import Variable
 from markers import Operator
+from distance import distance
 
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -20,9 +21,12 @@ detected = {}
 for i in range(50):
     detected[i] = False
 
-variables = []
-operators = []
+# id to marker
+variables = {}
+operators = {}
 
+timeout = 0
+updated = False
 
 while (cap.isOpened()):
     ret, frame = cap.read()
@@ -34,6 +38,8 @@ while (cap.isOpened()):
     frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
     img1 = frame
     
+    curvar, curops = [], []
+    
 
     if (len(corners)):
         ids2 = ids.flatten()
@@ -43,30 +49,72 @@ while (cap.isOpened()):
         label = -1
         for id in ids2:
             label += 1
-            if (not detected[id]):
-                if (id == 2):
+            
+            if (id == 2):
+                if (not detected[id]):
                     oper = Operator(img1, label, frame, corners, frame_width, frame_height)
-                    operators.append(oper)
-                else:
-                    #print("label is ", label)
+                    operators[id] = oper
+                curops.append(operators[id])
+            else:
+                if (not detected[id]):
                     var = Variable(img1, label, frame, corners, frame_width, frame_height)
-                    variables.append(var)
-                detected[id] = True
+                    variables[id] = var
+                curvar.append(variables[id])
+            detected[id] = True
         #variables[0].print()
                 
-        for var in variables:
-            print(len(variables))
+        for var in curvar:
+            var.print()
             var.update(img1, frame, corners)
             var.display()
             
-        for oper in operators:
+        for oper in curops:
             #print("OPERATORS", len(operators))
             oper.update(img1, frame, corners)
             oper.display()
+            
+            
+        # check for operation
+        if (len(curops) and len(curvar) and not updated):
+            # support single variable operations
+            for op in curops:  
+                tl = corners[op.label][0][0]
+                tr = corners[op.label][0][1]
+                br = corners[op.label][0][2]
+                bl = corners[op.label][0][3]
+                    
+                for var in curvar:
+                    tl2 = corners[var.label][0][0]
+                    tr2 = corners[var.label][0][1]
+                    br2 = corners[var.label][0][2]
+                    bl2 = corners[var.label][0][3]
+                    
+                    d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
+                    
+                    if (d <= 200):
+                        updated = True
+                        value = input("Please input a value to update " + var.name + " : ")
+                        
+                        if (var.type == "num"):
+                            value = int(value)
+                            
+                        op.compute(var, value=value)
+                
+                        
+                        
+                        
+                        
         
         
     cv2.imshow("augmented", img1)
     cv2.imshow("Frame Markers", frame_markers)
+    
+    if (updated):
+        timeout += 1
+    
+    if (timeout == 50):
+        updated = False
+    
     
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
