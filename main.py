@@ -43,62 +43,92 @@ while (cap.isOpened()):
 
     if (len(corners)):
         ids2 = ids.flatten()
-        #augment(0, frame, corners, (200, 200), blank_frame,\
-                        #(frame_width, frame_height), img1)
         
-        label = -1
+        eindex = -1
         for id in ids2:
-            label += 1
+            eindex += 1
             
             if (id == 2):
                 if (not detected[id]):
-                    oper = Operator(img1, label, frame, corners, frame_width, frame_height)
+                    oper = Operator(id, img1, eindex, frame, corners, frame_width, frame_height)
                     operators[id] = oper
                 curops.append(operators[id])
             else:
                 if (not detected[id]):
-                    var = Variable(img1, label, frame, corners, frame_width, frame_height)
+                    var = Variable(id, img1, eindex, frame, corners, frame_width, frame_height)
                     variables[id] = var
                 curvar.append(variables[id])
             detected[id] = True
-        #variables[0].print()
-                
+        
+      
         for var in curvar:
-            var.print()
-            var.update(img1, frame, corners)
+           
+            eindex = -1
+            for id in ids2:
+                eindex += 1
+                if (id == var.id):
+                    var.update(eindex, img1, frame, corners)
             var.display()
             
         for oper in curops:
-            #print("OPERATORS", len(operators))
-            oper.update(img1, frame, corners)
+            eindex = -1
+            for id in ids2:
+                eindex += 1
+                if (id == oper.id):
+                    oper.update(eindex, img1, frame, corners)
             oper.display()
             
             
         # check for operation
         if (len(curops) and len(curvar) and not updated):
+            # keep track of variables used in operations
+            completed = {}
+            for i in range(50):
+                completed[i] = False
+                
+            # 2D list of valid operator varaible pairs
+            poss = []
             # support single variable operations
             for op in curops:  
-                tl = corners[op.label][0][0]
-                tr = corners[op.label][0][1]
-                br = corners[op.label][0][2]
-                bl = corners[op.label][0][3]
+                tl = corners[op.eindex][0][0]
+                tr = corners[op.eindex][0][1]
+                br = corners[op.eindex][0][2]
+                bl = corners[op.eindex][0][3]
+    
                     
                 for var in curvar:
-                    tl2 = corners[var.label][0][0]
-                    tr2 = corners[var.label][0][1]
-                    br2 = corners[var.label][0][2]
-                    bl2 = corners[var.label][0][3]
+                    tl2 = corners[var.eindex][0][0]
+                    tr2 = corners[var.eindex][0][1]
+                    br2 = corners[var.eindex][0][2]
+                    bl2 = corners[var.eindex][0][3]
                     
                     d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
+                    print(d, var.id)
                     
-                    if (d <= 200):
+                    if (d <= 250):
+                        poss.append([var, op])
                         updated = True
-                        value = input("Please input a value to update " + var.name + " : ")
+            for i in poss:
+                for marker in i:
+                    print(marker.id)
+            
+            for i in poss:
+                for j in poss:
+                    # multi-variable operation
+                    if (i[0].id != j[0].id and i[1].id == j[1].id):
+                        completed[i[0].id] = True
+                        completed[j[0].id] = True
+                        op.compute(i[0], var2=j[0])
+            
+            # single variable operations
+            for i in poss:
+                if (not completed[i[0].id]):
+                    value = input("Please input a value to update " + var.name + " : ")
                         
-                        if (var.type == "num"):
-                            value = int(value)
+                    if (var.type == "num"):
+                        value = int(value)
                             
-                        op.compute(var, value=value)
+                    op.compute(var, value=value)
                 
                         
                         
