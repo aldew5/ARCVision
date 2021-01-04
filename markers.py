@@ -10,8 +10,9 @@ from augment import augment
 # variable name
 
 class Marker(object):
-    def __init__(self, label, image, frame, corners, frame_width, frame_height):
-        self.label = label
+    def __init__(self, id, eindex, image, frame, corners, frame_width, frame_height):
+        self.id = id
+        self.eindex = eindex
         self.frame = frame
         self.image = image
         self.corners = corners
@@ -19,20 +20,21 @@ class Marker(object):
         self.frame_width, self.frame_height = frame_width, frame_height
         
     
-    def update(self, image, frame, corners):
+    def update(self, eindex, image, frame, corners):
+        self.eindex = eindex
         self.image = image
         self.frame = frame
         self.corners = corners  
         
 
     def display(self, video_frame, image):
-        augment(self.label, self.frame, self.corners, (self.width, self.height), video_frame,\
+        augment(self.eindex, self.frame, self.corners, (self.width, self.height), video_frame,\
                 (self.frame_width, self.frame_height), image)
 
 
 class Variable(Marker):
-    def __init__(self, image, label, frame, corners, frame_width, frame_height):
-        Marker.__init__(self, label, image, frame, corners, frame_width, frame_height)
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
         
         self.name = "TEST" #input("Please enter a name for the variable: ")
         self.value = 7 #input("Please enter a value for the variable: ")
@@ -72,9 +74,9 @@ class Variable(Marker):
     
 
 class Operator(Marker):
-    def __init__(self, image, label, frame, corners, frame_width, frame_height):
-        Marker.__init__(self, label, image, frame, corners, frame_width, frame_height)
-        self.oper = '+' #input("What operation would you like to perform: ")
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
+        self.oper = '/' #input("What operation would you like to perform: ")
     
     def display(self):
         blank = np.zeros((200, 200, 3), np.uint8)
@@ -93,25 +95,50 @@ class Operator(Marker):
     def compute(self, var1, var2=None, value=None):
         if (var2 == None):
             if (var1.type == "num" and (type(value) == int or type(value) == float)):
-                var1.set_value(var1.value + value)
+                if (self.oper == '+'):
+                    var1.set_value(var1.value + value)
+                elif (self.oper == '-'):
+                    var1.set_value(var1.value - value)
+                elif (self.oper == '*'):
+                    var1.set_value(var1.value * value)
+                elif (self.oper == '/'):
+                    var1.set_value(var1.value / value)
           
             elif (var1.type == "string" and type(value) == str):
-                var1.set_value(var1.value + value)
+                if (self.oper == '+'):
+                    var1.set_value(var1.value + value)
+                else:
+                    print("ERROR")
+                    print("The", self.oper, "operation is undefined for objects of type string")
             else:
                 print("ERROR")
                 print("Incompatible data types")
         
         elif(value == None):
             if (var1.type == var2.type):
-                var1.set_value(var1.value + var2.value)
+                if (self.oper == '+'):
+                    var1.set_value(var1.value + var2.value)
+                elif (var1.type == "string"):
+                    print("ERROR")
+                    print("The", self.oper, "operation is undefined for objects of type string")
+                elif (self.oper == '-'):
+                    var1.set_value(var1.value - var2.value)
+                elif (self.oper == '*'):
+                    var1.set_value(var1.value * var2.value)
+                elif (self.oper == '/'):
+                    var1.set_value(var1.value / var2.value)
+                    
             else:
                 print("ERROR")
                 print("Incompatible data types")
         
 class Loop(Marker):
-    def __init__(self, image, label, frame, corners, frame_width, frame_height, iter_count):
-        Marker.__init__(self, label, image, frame, corners, frame_width, frame_height)
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, iter_count):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
         self.iter_count = iter_count
     
     
             
+        
+        
+    
