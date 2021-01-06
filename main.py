@@ -4,6 +4,7 @@ from cv2 import aruco
 from augment import *
 from markers import *
 from distance import distance
+from color_detection import detect_red
 
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -79,54 +80,53 @@ while (cap.isOpened()):
             
         # check for operation
         if (len(curops) and len(curvar) and not updated):
-            # keep track of variables used in operations
-            completed = {}
-            for i in range(50):
-                completed[i] = False
-                
-            # 2D list of valid operator varaible pairs
-            poss = []
-            # support single variable operations
-            for op in curops:  
-                tl = corners[op.eindex][0][0]
-                tr = corners[op.eindex][0][1]
-                br = corners[op.eindex][0][2]
-                bl = corners[op.eindex][0][3]
-    
+            if (detect_red(frame)):
+                # keep track of variables used in operations
+                completed = {}
+                for i in range(50):
+                    completed[i] = False
                     
-                for var in curvar:
-                    tl2 = corners[var.eindex][0][0]
-                    tr2 = corners[var.eindex][0][1]
-                    br2 = corners[var.eindex][0][2]
-                    bl2 = corners[var.eindex][0][3]
-                    
-                    d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
-                    print(d, var.id)
-                    
-                    if (d <= 250):
-                        poss.append([var, op])
-                        updated = True
-            for i in poss:
-                for marker in i:
-                    print(marker.id)
-            
-            for i in poss:
-                for j in poss:
-                    # multi-variable operation
-                    if (i[0].id != j[0].id and i[1].id == j[1].id):
-                        completed[i[0].id] = True
-                        completed[j[0].id] = True
-                        op.compute(i[0], var2=j[0])
-            
-            # single variable operations
-            for i in poss:
-                if (not completed[i[0].id]):
-                    value = input("Please input a value to update " + var.name + " : ")
+                # 2D list of valid operator varaible pairs
+                poss = []
+                # support single variable operations
+                for op in curops:  
+                    tl = corners[op.eindex][0][0]
+                    tr = corners[op.eindex][0][1]
+                    br = corners[op.eindex][0][2]
+                    bl = corners[op.eindex][0][3]
+        
                         
-                    if (var.type == "num"):
-                        value = int(value)
+                    for var in curvar:
+                        tl2 = corners[var.eindex][0][0]
+                        tr2 = corners[var.eindex][0][1]
+                        br2 = corners[var.eindex][0][2]
+                        bl2 = corners[var.eindex][0][3]
+                        
+                        d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
+                        print(d, var.id)
+                        
+                        if (d <= 300):
+                            poss.append([var, op])
+                            updated = True
+                
+                
+                for i in poss:
+                    for j in poss:
+                        # multi-variable operation
+                        if (i[0].id != j[0].id and i[1].id == j[1].id):
+                            completed[i[0].id] = True
+                            completed[j[0].id] = True
+                            op.compute(i[0], var2=j[0])
+                
+                # single variable operations
+                for i in poss:
+                    if (not completed[i[0].id]):
+                        value = input("Please input a value to update " + var.name + " : ")
                             
-                    op.compute(var, value=value)
+                        if (var.type == "num"):
+                            value = int(value)
+                                
+                        op.compute(var, value=value)
                 
                         
                         
