@@ -34,15 +34,33 @@ class Marker(object):
 class Variable(Marker):
     def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
         Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
-        
+
+        self.type = input("Please declare the variable's type (String or Int): ")
         self.name = input("Please enter a name for the variable: ")
         self.value = input("Please enter a value for the variable: ")
         
-        if (type(self.value) == int or type(self.value) == float):
-            self.type = "num"
-        elif(type(self.value) == str):
+        if self.type == "String":
             self.type = "string"
-        
+        elif self.type == "Int" or self.type == "int":
+            self.type = "int"
+
+            try:
+                self.value = int(self.value())
+            except TypeError:
+                print("ERROR")
+                print("The value assigned to", self.name, "doesn't match the type")
+
+                loop = True
+                while True:
+                    try:
+                        self.value = int(input("Please input a new value: "))
+                        loop = False
+                    except ValueError:
+                        print("ERROR")
+                        print("The value assigned to", self.name, "doesn't match the type")
+                        loop = True
+                    if not loop:
+                        break
         
 
     def display(self):
