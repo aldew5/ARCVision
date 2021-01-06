@@ -4,13 +4,13 @@ from cv2 import aruco
 from augment import *
 from markers import *
 from distance import distance
-from color_detection import detect_red
+from color_detection import detect_color
 
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
-cap = cv2.VideoCapture(-1)
 
+cap = cv2.VideoCapture(0)
 aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
 parameters = aruco.DetectorParameters_create()
 
@@ -27,7 +27,9 @@ operators = {}
 timeout = 0
 updated = False
 
+
 while (cap.isOpened()):
+    #print("IN")
     ret, frame = cap.read()
     frame_height, frame_width, frame_channels = frame.shape
     
@@ -80,7 +82,7 @@ while (cap.isOpened()):
             
         # check for operation
         if (len(curops) and len(curvar) and not updated):
-            if (detect_red(frame)):
+            if (detect_color(frame, "red")):
                 # keep track of variables used in operations
                 completed = {}
                 for i in range(50):
@@ -103,7 +105,6 @@ while (cap.isOpened()):
                         bl2 = corners[var.eindex][0][3]
                         
                         d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
-                        print(d, var.id)
                         
                         if (d <= 300):
                             poss.append([var, op])
