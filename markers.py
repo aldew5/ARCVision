@@ -35,8 +35,8 @@ class Variable(Marker):
     def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
         Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
         
-        self.name = "TEST" #input("Please enter a name for the variable: ")
-        self.value = 7 #input("Please enter a value for the variable: ")
+        self.name = input("Please enter a name for the variable: ")
+        self.value = input("Please enter a value for the variable: ")
         
         if (type(self.value) == int or type(self.value) == float):
             self.type = "num"
@@ -75,7 +75,7 @@ class Variable(Marker):
 class Operator(Marker):
     def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
         Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
-        self.oper = '/' #input("What operation would you like to perform: ")
+        self.oper = input("What operation would you like to perform: ")
     
     def display(self):
         blank = np.zeros((200, 200, 3), np.uint8)
