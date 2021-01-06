@@ -23,14 +23,17 @@ class Button(object):
                 return True
                 
         return False
-
+a
 class CheckBox(Button):
     def __init__(self, x, y, width, height):
-        Button.__init__(self, (200,255,255), x, y, width, height)
+        Button.__init__(self, (255,255,255), x, y, width, height)
         self.isToggled = False
 
     def draw(self, win):
+        rect = pg.Rect(self.x, self.y, self.width, self.height)
         if not self.isToggled:
-            pg.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
+            #rect.fill((255,255,255), rect)
+            pg.draw.rect(win, (0,0,0), rect, 2)
         else:
-            pg.draw.rect(win, (0,0,0), (self.x, self.y, self.width, self.height), 0)
+            rect.fill((255,255,255))
+            pg.draw.rect(win, (0,0,0), (self.x, self.y, self.width, self.height), 2)
