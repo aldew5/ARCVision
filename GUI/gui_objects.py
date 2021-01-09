@@ -23,7 +23,7 @@ class Button(object):
                 return True
                 
         return False
-a
+
 class CheckBox(Button):
     def __init__(self, x, y, width, height):
         Button.__init__(self, (255,255,255), x, y, width, height)

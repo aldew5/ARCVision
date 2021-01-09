@@ -194,18 +194,7 @@ class Operator(Marker):
                 print("ERROR")
                 print("Incompatible data types")
         
-class Loop(Marker):
-    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, iter_count):
-        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
-        self.iter_count = iter_count
-
-        # need a way of storing updates
-        # the start marker opens a terminal
-        # the user can type in python code (maybe some sort of aid?)
-        # then when they confirm, the program will be run self.iter_count times
-
-    def run():
-        pass
+        
     
     
             
