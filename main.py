@@ -24,6 +24,7 @@ for i in range(50):
 # keep lists of different markers
 variables = {}
 operators = {}
+loops = {}
 
 # keep track of whether or not an operation has been performed
 # and set a timer between them
@@ -47,7 +48,7 @@ while (cap.isOpened()):
 
     # keep a list of the variables and operators currently
     # in the frame
-    curvar, curops = [], []
+    curvar, curops, curloops = [], [], []
     
     # we have detected at least one marker
     if (len(corners)):
@@ -59,14 +60,24 @@ while (cap.isOpened()):
             # save the index in the corners array
             # that corresponds to the current id
             eindex += 1
+
+            if (id == 1):
+                # start a loop
+                if (not detected[id]):
+                    loop = Loop(id, img1, eindex, frame, corners, frame_width, frame_height, 10)
+                    loop.set_code()
+                    loops[id] = loop
+                curloops.append(loop)  
+                    
             
-            if (id == 2):
+            elif (id == 2):
                 # declare a new operator
                 if (not detected[id]):
                     oper = Operator(id, img1, eindex, frame, corners, frame_width, frame_height)
                     operators[id] = oper
                 # update the curops array
                 curops.append(operators[id])
+                    
             else:
                 # delcare a new varaible 
                 if (not detected[id]):
@@ -78,7 +89,6 @@ while (cap.isOpened()):
 
         # loop through the variables currently in the frame
         for var in curvar:
-           
             eindex = -1
             for id in ids2:
                 eindex += 1
@@ -96,7 +106,25 @@ while (cap.isOpened()):
                 if (id == oper.id):
                     oper.update(eindex, img1, frame, corners)
             oper.display()
-            
+
+        # update the loop display
+        for loop in curloops:
+            eindex = -1
+            for id in ids2:
+                eindex += 1
+                if (id == loop.id):
+                    loop.update(eindex, img1, frame, corners)
+            loop.display()
+
+
+        # if there is a loop marker on the screen and
+        # the color green, execute the loop
+        if (len(curloops)):
+            if (detect_color(frame, "green")):
+                updated = False
+                for loop in curloops:
+                    loop.execute()
+        
             
         # check for operation
         if (len(curops) and len(curvar) and not updated):
