@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 from cv2 import aruco
 from augment import *
+from loop_code import run
 
 
 class Marker(object):
@@ -193,6 +194,53 @@ class Operator(Marker):
             else:
                 print("ERROR")
                 print("Incompatible data types")
+
+
+class Loop(Marker):
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, iter_count):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
+        self.iter_count = iter_count
+        self.lines = []
+
+    def set_code(self):
+        file = open("loop_code.py", 'w')
+        
+        print("Write the loop code here: ")
+    
+        while True:
+            line = input()
+            if line == "END":
+                break
+            else:
+                self.lines.append(line)
+
+        file.write("def run():\n")
+        for line in self.lines:
+            file.write("\t")
+            file.write(line)
+            file.write("\n")
+
+        file.close()
+
+    def execute(self):
+        for i in range(self.iter_count):
+            run()
+
+    def display(self):
+        blank = np.zeros((200, 200, 3), np.uint8)
+        blank[:, 0:200] = (255, 255, 255)
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        bc = (100, 100)
+        
+        cv2.putText(blank, "LOOP", bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
+                    2)
+        
+        blank_frame = cv2.resize(blank, (200, 200))
+        
+        Marker.display(self, blank_frame, self.image)
+        
+
         
         
     
