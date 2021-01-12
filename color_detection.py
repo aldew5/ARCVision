@@ -5,7 +5,8 @@ import cv2
 
 def detect_color(image, color):
 
-    # convert image from BGR to HSV (hue-stauration value)
+
+    # convert image from BGR to HSV (hue-saturation value)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # set ranges for red
@@ -100,6 +101,9 @@ def detect_color(image, color):
                 
           
         #cv2.imshow("HIGH", image)
+    else:
+        print("Invalid color")
+    
     return False
     
 
