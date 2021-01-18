@@ -5,37 +5,12 @@ from augment import *
 from markers import *
 from distance import distance
 from color_detection import detect_color
-from GUI.gui import *
 
 
-# access webcame video stream
-cap = cv2.VideoCapture(0)
-# delare the aruco dictionary
-aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
-parameters = aruco.DetectorParameters_create()
-
-# store a dictionary of detected markers outside the main loop
-# so we can store their values 
-detected = {}
-
-# inintialize the dictionary
-for i in range(50):
-    detected[i] = False
-
-# keep lists of different markers
-variables = {}
-operators = {}
-loops = {}
-
-# keep track of whether or not an operation has been performed
-# and set a timer between them
-timeout = 0
-updated = False
+def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
+               loops, timeout, updated):
 
 
-
-
-while (cap.isOpened()):
     # capture frame by frame
     ret, frame = cap.read()
     # take the dimensions of the image
@@ -193,8 +168,8 @@ while (cap.isOpened()):
                         
         
     # show the different frames
-    cv2.imshow("augmented", img1)
-    cv2.imshow("Frame Markers", frame_markers)
+    #cv2.imshow("augmented", img1)
+    #cv2.imshow("Frame Markers", frame_markers)
 
     # we completed an operation so update the timeout counter
     if (updated):
@@ -206,9 +181,9 @@ while (cap.isOpened()):
     
     # if we quite
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        return ()
+
+    return [img1, frame_markers]
     
-# close the frames
-cap.release()
-cv2.destroyAllWindows()
+
 
