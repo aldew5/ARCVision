@@ -85,8 +85,19 @@ class App():
         title = tk.Label(self.window, text="ARCVision",
                          anchor="center",
                          font=("Times New Roman", 20))
-        title.place(relx=0.35, rely=0.1)
+        title.place(relx=0.4, rely=0.05)
+        subtitle = tk.Label(self.window, text="Commands",
+                            font=("Time New Roman", 15))
+        subtitle.place(relx=0.65, rely=0.1)
 
+        terminal = tk.Frame(self.window, width=3000, height=500)
+        terminal.place(relx=0.5, rely=0.15)
+
+        terminal.grid_propagate(False)
+        val = tk.StringVar()
+        valEntry = tk.Entry(terminal, textvariable=val)
+        valEntry.grid(sticky="we")
+        
 
 
     def videoLoop(self):
@@ -111,7 +122,7 @@ class App():
                 if self.panel1 is None:
                     self.panel1 = tk.Label(image=image1)
                     self.panel1.image = image1
-                    self.panel1.pack(side="left", padx=10, pady=10)
+                    self.panel1.place(relx=0.05, rely=0.15)
 
                 else:
                     self.panel1.configure(image=image1)
@@ -120,7 +131,7 @@ class App():
                 if self.panel2 is None:
                     self.panel2 = tk.Label(image=image2)
                     self.panel2.image = image2
-                    self.panel2.pack(side="right", padx=10, pady=10)
+                    self.panel2.place(relx=0.05, rely=0.55)
                 else:
                     self.panel2.configure(image=image2)
                     self.panel2.image = image2
