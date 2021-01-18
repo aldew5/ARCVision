@@ -5,6 +5,7 @@ from augment import *
 from markers import *
 from distance import distance
 from color_detection import detect_color
+from GUI.gui import *
 
 
 # access webcame video stream
@@ -30,6 +31,8 @@ loops = {}
 # and set a timer between them
 timeout = 0
 updated = False
+
+
 
 
 while (cap.isOpened()):

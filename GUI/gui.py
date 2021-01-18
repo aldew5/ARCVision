@@ -1,45 +1,107 @@
-import pygame as pg
-from gui_objects import *
+import tkinter as tk
+from PIL import Image
+from PIL import ImageTk
+import threading
+import datetime
+import imutils
+import cv2
 
-pg.init()
 
-win = pg.display.set_mode((700, 700))
-pg.display.set_caption("Science Fair 2020-2021")
+class Menu(tk.Frame):
+    def __init__(self, window):
+        self.window = window
 
-clock = pg.time.Clock()
+    def show(self):
+        title = tk.Label(self.window, text="ARCVision",
+                         anchor="center",
+                         font=("Times New Roman", 20))
+        title.place(relx=0.35, rely=0.3)
 
- 
-box = CheckBox(243, 252, 10, 10)
-def drawMain(): 
-    win.fill((255, 255, 255))
+        checked = tk.IntVar()
+        box = tk.Checkbutton(self.window, text="Enable descriptors", variable=checked)
+        box.place(relx=0.35, rely=0.4)
 
-    font = pg.font.SysFont("comicsans", 60)
-    text = font.render("ARCVision", 1, (0,0,0))
-    win.blit(text, ((700 - text.get_width()) /2, 200))
-    #print(text.get_height())
-    box.draw(win)
+        start = tk.Button(self.window,
+                          text="Start Application",
+                          command=self.destroy,
+                          bg="green")
+        start.place(relx=0.35, rely=0.5)
 
+    def destroy(self):
+        self.window.destroy()
+        
+        window = tk.Tk()
+        window.title("ARCVision")
+        window.geometry("500x500")
+        
+        app = App(window, cap)
+
+        while True:
+            app.show()
+            window.mainloop()
+        
     
+        
 
-run, main = True, True
-while run:
-    if main:
-        drawMain()
-        pg.display.update()
 
-    for event in pg.event.get():
-        pos = pg.mouse.get_pos()
+class App():
+    def __init__(self, window, vs):
+        self.window = window
+        self.vs = vs
+        self.frame = None
+        self.thread = None
+        self.stopEvent = None
+        self.panel = None
+        
+        self.stopEvent = threading.Event()
+        self.thread = threading.Thread(target=self.videoLoop, args=())
+        self.thread.start()
 
-        if event.type == pg.QUIT:
-            run = False
-            pg.quit()
 
-        if main:
-            if event.type == pg.MOUSEBUTTONDOWN and box.isHover(pos):
-                print("TOGGLED")
-                if box.isToggled:
-                    box.isToggled = False
+    def show(self):
+        title = tk.Label(self.window, text="ARCVision",
+                         anchor="center",
+                         font=("Times New Roman", 20))
+        title.place(relx=0.35, rely=0.1)
+
+
+
+    def videoLoop(self):
+
+        try:
+            while not self.stopEvent.is_set():
+                print("HERE")
+                ret, self.frame = self.vs.read()
+                self.frame = cv2.resize(self.frame, (300,300))
+
+                # swap the channels becuase openCV uses BGR whereas PIL
+                # uses RGB
+                image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+                image = Image.fromarray(image)
+                image = ImageTk.PhotoImage(image)
+
+                if self.panel is None:
+                    self.panel = tk.Label(image=image)
+                    self.panel.image = image
+                    self.panel.pack(side="left", padx=10, pady=10)
+
                 else:
-                    box.isToggled = True
-            
-            
+                    self.panel.configure(image=image)
+                    self.panel.image = image
+
+        except RuntimeError:
+            print("[INFO] caught a RuntimeError")
+        
+
+
+if (__name__ == "__main__"):
+    window = tk.Tk()
+    window.title("ARCVision")
+    window.geometry("500x500")
+    
+    menu = Menu(window)
+    menu.show()
+    
+    window.mainloop()
+
+
