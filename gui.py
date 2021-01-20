@@ -5,6 +5,8 @@ import threading
 import cv2
 from cv2 import aruco
 from main import get_frames
+from tkinter import scrolledtext 
+
 
 cap = cv2.VideoCapture(0)
 
@@ -90,13 +92,18 @@ class App():
                             font=("Time New Roman", 15))
         subtitle.place(relx=0.65, rely=0.1)
 
-        terminal = tk.Frame(self.window, width=3000, height=500)
-        terminal.place(relx=0.5, rely=0.15)
+        # https://www.geeksforgeeks.org/python-tkinter-scrolledtext-widget/
+        textfield = scrolledtext.ScrolledText(self.window,  
+                                      wrap = tk.WORD,  
+                                      width = 30,  
+                                      height = 27,  
+                                      font = ("Times New Roman", 
+                                              15))
+        textfield.place(relx=0.6, rely=0.15)
 
-        terminal.grid_propagate(False)
-        val = tk.StringVar()
-        valEntry = tk.Entry(terminal, textvariable=val)
-        valEntry.grid(sticky="we")
+        
+
+        
         
 
 
