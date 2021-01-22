@@ -7,7 +7,6 @@ from cv2 import aruco
 from main import get_frames
 from tkinter import scrolledtext
 from markers import *
-from console import Console
 
 
 """
@@ -37,6 +36,32 @@ loops = {}
 # and set a timer between them
 timeout = 0
 updated = False
+
+class Console():
+    def __init__(self, x, y, window):
+        self.x = x
+        self.y = y
+        self.cursor = '> '
+        self.window = window
+
+        self.textfield = scrolledtext.ScrolledText(self.window,  
+                                      wrap = tk.WORD,  
+                                      width = 30,  
+                                      height = 27,  
+                                      font = ("Times New Roman", 
+                                              15))
+        
+    def show(self):
+        # https://www.geeksforgeeks.org/python-tkinter-scrolledtext-widget/
+        self.textfield.place(relx=self.x, rely=self.y)
+        self.textfield.insert(tk.INSERT, self.cursor)
+
+    def update(self, text):
+        self.textfield.insert(tk.INSERT,  "\n" + text)
+
+    def get_text(self):
+        a = self.textfield.get('1.0', 'end-1c')
+        print(a)
     
 
 class Menu(tk.Frame):
@@ -67,10 +92,9 @@ class Menu(tk.Frame):
         window.geometry("800x800")
         
         app = App(window, cap)
-
         
-        while True:
-            app.show()
+        app.show()
+        app.window.mainloop()
         
     
         
@@ -102,7 +126,7 @@ class App():
 
         console = Console(0.6, 0.15, self.window)
         console.show()
-        console.update("HI")
+        #console.update("HI")
 
        
         #console.get_text()
@@ -112,46 +136,42 @@ class App():
 
     def videoLoop(self):
 
-        
-        while not self.stopEvent.is_set():
-            self.frames = get_frames(self.vs, aruco_dict, parameters, detected,
-                                     variables, operators, loops, timeout, updated)
-            self.frames[0] = cv2.resize(self.frames[0], (300,300))
-            self.frames[1] = cv2.resize(self.frames[1], (300,300))
+        try:
+            while not self.stopEvent.is_set():
+                self.frames = get_frames(self.vs, aruco_dict, parameters, detected,
+                                         variables, operators, loops, timeout, updated)
+                self.frames[0] = cv2.resize(self.frames[0], (300,300))
+                self.frames[1] = cv2.resize(self.frames[1], (300,300))
 
-            # swap the channels becuase openCV uses BGR whereas PIL
-            # uses RGB
-            print("HER")
-            image1 = cv2.cvtColor(self.frames[0], cv2.COLOR_BGR2RGB)
-            print('1')
-            image1 = Image.fromarray(image1)
-            print('2')
-            image1 = ImageTk.PhotoImage(image1)
-            print("HER")
-    
-            
-            image2 = cv2.cvtColor(self.frames[1], cv2.COLOR_BGR2RGB)
-            image2 = Image.fromarray(image2)
-            image2 = ImageTk.PhotoImage(image2)
+                # swap the channels becuase openCV uses BGR whereas PIL
+                # uses RGB
+                image1 = cv2.cvtColor(self.frames[0], cv2.COLOR_BGR2RGB)
+                image1 = Image.fromarray(image1)
+                image1 = ImageTk.PhotoImage(image1)
 
-            print("HERE")
+                image2 = cv2.cvtColor(self.frames[1], cv2.COLOR_BGR2RGB)
+                image2 = Image.fromarray(image2)
+                image2 = ImageTk.PhotoImage(image2)
 
-            if self.panel1 is None:
-                self.panel1 = tk.Label(image=image1)
-                self.panel1.image = image1
-                self.panel1.place(relx=0.05, rely=0.15)
+                if self.panel1 is None:
+                    self.panel1 = tk.Label(image=image1)
+                    self.panel1.image = image1
+                    self.panel1.place(relx=0.05, rely=0.15)
 
-            else:
-                self.panel1.configure(image=image1)
-                self.panel1.image = image1
+                else:
+                    self.panel1.configure(image=image1)
+                    self.panel1.image = image1
 
-            if self.panel2 is None:
-                self.panel2 = tk.Label(image=image2)
-                self.panel2.image = image2
-                self.panel2.place(relx=0.05, rely=0.55)
-            else:
-                self.panel2.configure(image=image2)
-                self.panel2.image = image2
+                if self.panel2 is None:
+                    self.panel2 = tk.Label(image=image2)
+                    self.panel2.image = image2
+                    self.panel2.place(relx=0.05, rely=0.55)
+                else:
+                    self.panel2.configure(image=image2)
+                    self.panel2.image = image2
+
+        except RuntimeError:
+            print("[INFO] caught a RuntimeError")
 
         
 
@@ -164,6 +184,6 @@ if (__name__ == "__main__"):
     menu = Menu(window)
     menu.show()
     
-    #window.mainloop()
+    window.mainloop()
 
 
