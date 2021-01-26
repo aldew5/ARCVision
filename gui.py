@@ -95,7 +95,6 @@ class Menu(tk.Frame):
         
         app.show()
         app.window.mainloop()
-        
     
         
 
@@ -184,6 +183,5 @@ if (__name__ == "__main__"):
     menu = Menu(window)
     menu.show()
     
-    window.mainloop()
 
 

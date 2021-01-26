@@ -70,9 +70,9 @@ def detect_color(image, color):
                                            (x + w, y + h),  
                                            (0, 0, 255), 2) 
                   
-                cv2.putText(image, "Red Colour", (x, y), 
+                cv2.putText(image, "Green Colour", (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
-                            (0, 0, 255))
+                            (0, 255, 0))
                 return True
 
     elif (color == "blue"):
@@ -95,7 +95,7 @@ def detect_color(image, color):
                   
                 cv2.putText(image, "Blue Colour", (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
-                            (0, 0, 255))
+                            (255, 0, 0))
 
                 return True
                 

@@ -45,7 +45,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                     loop = Loop(id, img1, eindex, frame, corners, frame_width, frame_height, 10)
                     loop.set_code()
                     loops[id] = loop
-                curloops.append(loop)  
+                curloops.append(loops[id])  
                     
             
             elif (id == 2):
@@ -98,7 +98,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
         # if there is a loop marker on the screen and
         # the color green, execute the loop
         if (len(curloops)):
-            if (detect_color(frame, "green")):
+            if (detect_color(frame, "blue")):
                 updated = False
                 for loop in curloops:
                     loop.execute()
@@ -157,7 +157,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                         value = input("Please input a value to update " + var.name + " : ")
 
                         # numerical computation
-                        if (var.type == "num"):
+                        if (var.type == "int"):
                             value = int(value)
                                 
                         op.compute(var, value=value)

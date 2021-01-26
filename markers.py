@@ -149,10 +149,12 @@ class Operator(Marker):
     def compute(self, var1, var2=None, value=None):
         """ Carry out an operation """
 
+        print(var1.type, type(value))
+
         # it is a value, variable operation
         if (var2 == None):
             # make sure the value given is compatible with numerical operations
-            if (var1.type == "num" and (type(value) == int or type(value) == float)):
+            if (var1.type == "int" and (type(value) == int or type(value) == float)):
                 if (self.oper == '+'):
                     var1.set_value(var1.value + value)
                 elif (self.oper == '-'):
