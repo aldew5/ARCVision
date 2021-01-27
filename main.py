@@ -8,7 +8,7 @@ from color_detection import detect_color
 
 
 def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
-               loops, timeout, updated):
+               loops, timeout, updated, console):
 
 
     # capture frame by frame
@@ -42,7 +42,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
             if (id == 1):
                 # start a loop
                 if (not detected[id]):
-                    loop = Loop(id, img1, eindex, frame, corners, frame_width, frame_height, 10)
+                    loop = Loop(id, img1, eindex, frame, corners, frame_width, frame_height, 10, console)
                     loop.set_code()
                     loops[id] = loop
                 curloops.append(loops[id])  
@@ -51,7 +51,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
             elif (id == 2):
                 # declare a new operator
                 if (not detected[id]):
-                    oper = Operator(id, img1, eindex, frame, corners, frame_width, frame_height)
+                    oper = Operator(id, img1, eindex, frame, corners, frame_width, frame_height, console)
                     operators[id] = oper
                 # update the curops array
                 curops.append(operators[id])
@@ -59,7 +59,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
             else:
                 # delcare a new varaible 
                 if (not detected[id]):
-                    var = Variable(id, img1, eindex, frame, corners, frame_width, frame_height)
+                    var = Variable(id, img1, eindex, frame, corners, frame_width, frame_height, console)
                     variables[id] = var
                 curvar.append(variables[id])
             detected[id] = True
@@ -154,7 +154,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                 for i in poss:
                     if (not completed[i[0].id]):
                         # request the value that will be used in the computation
-                        value = input("Please input a value to update " + var.name + " : ")
+                        value = console.get_input("Please input a value to update " + var.name + " : ")
 
                         # numerical computation
                         if (var.type == "int"):

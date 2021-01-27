@@ -7,6 +7,7 @@ from cv2 import aruco
 from main import get_frames
 from tkinter import scrolledtext
 from markers import *
+import keyboard
 
 
 """
@@ -61,7 +62,17 @@ class Console():
 
     def get_text(self):
         a = self.textfield.get('1.0', 'end-1c')
-        print(a)
+        return a
+
+    def get_input(self, text):
+        self.update(text)
+        # must then wait for enter key to be pressed
+        while True:
+            if keyboard.is_pressed('enter'):
+                break
+            
+        val = self.get_text()
+        return val
     
 
 class Menu(tk.Frame):
@@ -108,6 +119,7 @@ class App():
         self.stopEvent = None
         self.panel1 = None
         self.panel2 = None
+        self.console = Console(0.6, 0.15, self.window)
         
         self.stopEvent = threading.Event()
         self.thread = threading.Thread(target=self.videoLoop, args=())
@@ -123,8 +135,7 @@ class App():
                             font=("Time New Roman", 15))
         subtitle.place(relx=0.65, rely=0.1)
 
-        console = Console(0.6, 0.15, self.window)
-        console.show()
+        self.console.show()
         #console.update("HI")
 
        
@@ -138,7 +149,7 @@ class App():
         try:
             while not self.stopEvent.is_set():
                 self.frames = get_frames(self.vs, aruco_dict, parameters, detected,
-                                         variables, operators, loops, timeout, updated)
+                                         variables, operators, loops, timeout, updated, self.console)
                 self.frames[0] = cv2.resize(self.frames[0], (300,300))
                 self.frames[1] = cv2.resize(self.frames[1], (300,300))
 

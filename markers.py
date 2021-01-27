@@ -10,7 +10,7 @@ class Marker(object):
     An abstract class that defines some methods all markers in the program
     will use
     """
-    def __init__(self, id, eindex, image, frame, corners, frame_width, frame_height):
+    def __init__(self, id, eindex, image, frame, corners, frame_width, frame_height, console):
         self.id = id
         self.eindex = eindex
         self.frame = frame
@@ -18,6 +18,7 @@ class Marker(object):
         self.corners = corners
         self.width, self.height = 200, 200
         self.frame_width, self.frame_height = frame_width, frame_height
+        self.console = console
         
     # must be updated for each new frame
     def update(self, eindex, image, frame, corners):
@@ -35,13 +36,13 @@ class Marker(object):
 class Variable(Marker):
     """ Variable class """
     
-    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
-        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, console):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height, console)
 
         # take user input for variable declaration
-        self.type = input("Please declare the variable's type (String or Int): ")
-        self.name = input("Please enter a name for the variable: ")
-        self.value = input("Please enter a value for the variable: ")
+        self.type = console.get_input("Please declare the variable's type (String or Int): ")
+        self.name = console.get_input("Please enter a name for the variable: ")
+        self.value = console.get_input("Please enter a value for the variable: ")
         
         if self.type == "String" or self.type == "string":
             self.type = "string"
@@ -128,9 +129,9 @@ class Operator(Marker):
     variables, or a variable and a value
     """
     
-    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height):
-        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
-        self.oper = input("What operation would you like to perform: ")
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, console):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height, console)
+        self.oper = console.get_input("What operation would you like to perform: ")
     
     def display(self):
         blank = np.zeros((200, 200, 3), np.uint8)
@@ -199,8 +200,8 @@ class Operator(Marker):
 
 
 class Loop(Marker):
-    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, iter_count):
-        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height)
+    def __init__(self, id, image, eindex, frame, corners, frame_width, frame_height, iter_count, console):
+        Marker.__init__(self, id, eindex, image, frame, corners, frame_width, frame_height, console)
         self.iter_count = iter_count
         self.lines = []
 
