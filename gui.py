@@ -55,7 +55,7 @@ class Console():
     def show(self):
         # https://www.geeksforgeeks.org/python-tkinter-scrolledtext-widget/
         self.textfield.place(relx=self.x, rely=self.y)
-        self.textfield.insert(tk.INSERT, self.cursor)
+        #self.textfield.insert(tk.INSERT, self.cursor)
 
     def update(self, text):
         self.textfield.insert(tk.INSERT,  "\n" + text)
@@ -65,6 +65,7 @@ class Console():
         return a
 
     def get_input(self, text):
+        self.textfield.delete('1.0', 'end')
         self.update(text)
         # must then wait for enter key to be pressed
         while True:
@@ -72,7 +73,12 @@ class Console():
                 break
             
         val = self.get_text()
-        return val
+        ind = len(text) + 1
+
+        
+        self.textfield.delete('1.0', 'end')
+        #print("returning ", val[ind:], len(val[ind:]), "END")
+        return val[ind:]
     
 
 class Menu(tk.Frame):

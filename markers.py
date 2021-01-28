@@ -3,6 +3,7 @@ import cv2
 from cv2 import aruco
 from augment import *
 from loop_code import run
+import time
 
 
 class Marker(object):
@@ -41,7 +42,10 @@ class Variable(Marker):
 
         # take user input for variable declaration
         self.type = console.get_input("Please declare the variable's type (String or Int): ")
+        time.sleep(1)
+        #self.console.update("HERE", self.type)
         self.name = console.get_input("Please enter a name for the variable: ")
+        time.sleep(1)
         self.value = console.get_input("Please enter a value for the variable: ")
         
         if self.type == "String" or self.type == "string":
@@ -51,8 +55,8 @@ class Variable(Marker):
 
         # not a valid type
         else:
-            print("ERROR")
-            print(self.type, "is not a valid variable type")
+            self.console.update("ERROR")
+            self.console.update(self.type, "is not a valid variable type")
 
             loop = True
             # ask the user to input a valid type until they do so
@@ -60,8 +64,8 @@ class Variable(Marker):
                 self.type = input("Please input a new type: ")
 
                 if self.type != "string" and self.type != "String" and self.type != "Int" and self.type != "int":
-                    print("ERROR")
-                    print(self.type, "is an invalid varaible type")
+                    self.console.update("ERROR")
+                    self.console.update(self.type, "is an invalid varaible type")
                 else:
                     loop = False
             
@@ -72,8 +76,8 @@ class Variable(Marker):
             # self.value couldn't be converted to an integer
             # the input value was invalid
             except TypeError:
-                print("ERROR")
-                print("The value assigned to", self.name, "doesn't match the type")
+                self.console.update("ERROR")
+                self.console.update("The value assigned to", self.name, "doesn't match the type")
 
                 loop = True
                 # request that the user input a valid number
@@ -83,8 +87,8 @@ class Variable(Marker):
                         self.value = int(input("Please input a new value: "))
                         loop = False
                     except ValueError:
-                        print("ERROR")
-                        print("The value assigned to", self.name, "doesn't match the type")
+                        self.console.update("ERROR")
+                        self.console.update("The value assigned to", self.name, "doesn't match the type")
                         loop = True
                     if not loop:
                         break
@@ -113,8 +117,8 @@ class Variable(Marker):
         
 
     def print(self):
-        """ Neat printing format """
-        print(self.name, ":", self.value)
+        """ Neat print format """
+        self.console.update(self.name, ":", self.value)
         
     def set_value(self, value):
         """ Setter for value """
@@ -150,7 +154,7 @@ class Operator(Marker):
     def compute(self, var1, var2=None, value=None):
         """ Carry out an operation """
 
-        print(var1.type, type(value))
+        #self.console.update(var1.type, type(value))
 
         # it is a value, variable operation
         if (var2 == None):
@@ -170,11 +174,11 @@ class Operator(Marker):
                 if (self.oper == '+'):
                     var1.set_value(var1.value + value)
                 else:
-                    print("ERROR")
-                    print("The", self.oper, "operation is undefined for objects of type string")
+                    self.console.update("ERROR")
+                    self.console.update("The", self.oper, "operation is undefined for objects of type string")
             else:
-                print("ERROR")
-                print("Incompatible data types")
+                self.console.update("ERROR")
+                self.console.update("Incompatible data types")
 
         # variable, variable operation
         elif(value == None):
@@ -185,8 +189,8 @@ class Operator(Marker):
                     var1.set_value(var1.value + var2.value)
                 # not a concatenation operation and the type isn't a string
                 elif (var1.type == "string"):
-                    print("ERROR")
-                    print("The", self.oper, "operation is undefined for objects of type string")
+                    self.console.update("ERROR")
+                    self.console.update("The", self.oper, "operation is undefined for objects of type string")
                 elif (self.oper == '-'):
                     var1.set_value(var1.value - var2.value)
                 elif (self.oper == '*'):
@@ -195,8 +199,8 @@ class Operator(Marker):
                     var1.set_value(var1.value / var2.value)
                     
             else:
-                print("ERROR")
-                print("Incompatible data types")
+                self.console.update("ERROR")
+                self.console.update("Incompatible data types")
 
 
 class Loop(Marker):
@@ -208,7 +212,7 @@ class Loop(Marker):
     def set_code(self):
         file = open("loop_code.py", 'w')
         
-        print("Write the loop code here: ")
+        self.console.update("Write the loop code here: ")
     
         while True:
             line = input()
