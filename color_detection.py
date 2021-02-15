@@ -106,4 +106,3 @@ def detect_color(image, color):
     
     return False
     
-)
