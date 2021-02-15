@@ -106,5 +106,4 @@ def detect_color(image, color):
     
     return False
     
-
-#detect_color(image, "blue")
+)
