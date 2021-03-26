@@ -215,11 +215,7 @@ class Loop(Marker):
         file = open("loop_code.py", 'w')
     
         while True:
-<<<<<<< HEAD
             line = self.console.get_input("Write the loop code here: ")
-=======
-            line = self.console.get_input("")
->>>>>>> 8461c8f3fa22bafb0a195552fdf69f87c0c23927
             if line == "END":
                 break
             else:
