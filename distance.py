@@ -2,6 +2,8 @@ import math
 import cv2
 
 def distance(p1, p2, p3, p4, p5, p6, p7, p8):
+    """Computes the Euclidean distance between
+        two rectangles"""
     centroid1 = ((p1[0] + p2[0] + p3[0] + p4[0])/4,\
                  (p1[1] + p2[1] + p3[1] + p4[1])/4)
     

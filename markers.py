@@ -23,6 +23,7 @@ class Marker(object):
         
     # must be updated for each new frame
     def update(self, eindex, image, frame, corners):
+        """Update the parameters"""
         self.eindex = eindex
         self.image = image
         self.frame = frame
@@ -30,6 +31,7 @@ class Marker(object):
         
     # augments the ArUco Marker
     def display(self, video_frame, image):
+        """Display the AR"""
         augment(self.eindex, self.frame, self.corners, (self.width, self.height), video_frame,\
                 (self.frame_width, self.frame_height), image)
 
@@ -95,6 +97,7 @@ class Variable(Marker):
         
 
     def display(self):
+        """Display the AR"""
         # blank frame
         blank = np.zeros((200, 200, 3), np.uint8)
         # set it to white
@@ -210,12 +213,11 @@ class Loop(Marker):
         self.lines = []
 
     def set_code(self):
+        """Set the loop code"""
         file = open("loop_code.py", 'w')
-        
-        self.console.update("Write the loop code here: ")
     
         while True:
-            line = input()
+            line = self.console.get_input("Write the loop code here: ")
             if line == "END":
                 break
             else:
@@ -230,10 +232,12 @@ class Loop(Marker):
         file.close()
 
     def execute(self):
+        """Execute loop code"""
         for i in range(self.iter_count):
             run()
 
     def display(self):
+        """Display AR view"""
         blank = np.zeros((200, 200, 3), np.uint8)
         blank[:, 0:200] = (255, 255, 255)
 

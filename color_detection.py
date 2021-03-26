@@ -4,7 +4,7 @@ import cv2
 #image = cv2.imread("_data/blue_marker.jpg")
 
 def detect_color(image, color):
-
+    """Detects a specified colour in the frame"""
 
     # convert image from BGR to HSV (hue-saturation value)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -106,4 +106,4 @@ def detect_color(image, color):
     
     return False
     
-)
+

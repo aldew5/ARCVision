@@ -2,9 +2,13 @@ import cv2
 import numpy as np
 
 def order_points(pts):
-
+    """Orders the points in the pts array so that
+        they are in the correct order"""
+    # rectangle representation
     rect = np.zeros((4, 2), dtype = "float32")
     s = pts.sum(axis = 1)
+
+    # reorder points
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
  
@@ -15,6 +19,8 @@ def order_points(pts):
     return rect
 
 def four_point_transform(image, points, width=0, height=0):
+    """Computes a warped perspective that and a homography matrix
+        mapping the image back to its original position"""
     #upack points
     rect = order_points(points)
     (tl, tr, br, bl) = rect
@@ -45,6 +51,8 @@ def four_point_transform(image, points, width=0, height=0):
     return (warped, M)
 
 def augment(eindex, frame, corners, image_dim, video_frame, frame_dim, image):
+    """Augments the frame"""
+
     width, height = image_dim[0], image_dim[1]
     frame_width, frame_height = frame_dim[0], frame_dim[1]
     

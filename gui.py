@@ -9,12 +9,6 @@ from tkinter import scrolledtext
 from markers import *
 import keyboard
 
-
-"""
-Error with loading image
-"""
-
-
 cap = cv2.VideoCapture(0)
 
 aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
@@ -53,18 +47,21 @@ class Console():
                                               15))
         
     def show(self):
-        # https://www.geeksforgeeks.org/python-tkinter-scrolledtext-widget/
+        """Displays console"""
         self.textfield.place(relx=self.x, rely=self.y)
         #self.textfield.insert(tk.INSERT, self.cursor)
 
     def update(self, text):
+        """Updates console text"""
         self.textfield.insert(tk.INSERT,  "\n" + text)
 
     def get_text(self):
+        """Retrieves console text"""
         a = self.textfield.get('1.0', 'end-1c')
         return a
 
     def get_input(self, text):
+        """Retrieves user input"""
         self.textfield.delete('1.0', 'end')
         self.update(text)
         # must then wait for enter key to be pressed
@@ -77,7 +74,7 @@ class Console():
 
         
         self.textfield.delete('1.0', 'end')
-        #print("returning ", val[ind:], len(val[ind:]), "END")
+       
         return val[ind:]
     
 
@@ -86,6 +83,7 @@ class Menu(tk.Frame):
         self.window = window
 
     def show(self):
+        """Displays menu"""
         title = tk.Label(self.window, text="ARCVision",
                          anchor="center",
                          font=("Times New Roman", 20))
@@ -102,16 +100,8 @@ class Menu(tk.Frame):
         start.place(relx=0.35, rely=0.5)
 
     def destroy(self):
+        """Destorys introductory menu"""
         self.window.destroy()
-        
-        window = tk.Tk()
-        window.title("ARCVision")
-        window.geometry("800x800")
-        
-        app = App(window, cap)
-        
-        app.show()
-        app.window.mainloop()
     
         
 
@@ -133,6 +123,7 @@ class App():
 
 
     def show(self):
+        """Dislpays app"""
         title = tk.Label(self.window, text="ARCVision",
                          anchor="center",
                          font=("Times New Roman", 20))
@@ -151,7 +142,11 @@ class App():
 
 
     def videoLoop(self):
-
+        """
+            Main video loop that generates and augments
+            the two threads that will be displayed in the
+            panels
+        """
         try:
             while not self.stopEvent.is_set():
                 self.frames = get_frames(self.vs, aruco_dict, parameters, detected,
@@ -164,20 +159,22 @@ class App():
                 image1 = cv2.cvtColor(self.frames[0], cv2.COLOR_BGR2RGB)
                 image1 = Image.fromarray(image1)
                 image1 = ImageTk.PhotoImage(image1)
-
+            
                 image2 = cv2.cvtColor(self.frames[1], cv2.COLOR_BGR2RGB)
                 image2 = Image.fromarray(image2)
                 image2 = ImageTk.PhotoImage(image2)
 
+                # create the panel
                 if self.panel1 is None:
                     self.panel1 = tk.Label(image=image1)
                     self.panel1.image = image1
                     self.panel1.place(relx=0.05, rely=0.15)
 
                 else:
+                    # update the panel
                     self.panel1.configure(image=image1)
                     self.panel1.image = image1
-
+                
                 if self.panel2 is None:
                     self.panel2 = tk.Label(image=image2)
                     self.panel2.image = image2
@@ -191,7 +188,7 @@ class App():
 
         
 
-
+# run from the same file
 if (__name__ == "__main__"):
     window = tk.Tk()
     window.title("ARCVision")
@@ -199,6 +196,16 @@ if (__name__ == "__main__"):
     
     menu = Menu(window)
     menu.show()
-    
+    menu.window.mainloop()
 
+    # new window
+    window = tk.Tk()
+
+    window.title("ARCVision")
+    window.geometry("800x800")
+    
+    app = App(window, cap)
+    
+    app.show()
+    app.window.mainloop()
 

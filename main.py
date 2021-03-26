@@ -9,7 +9,7 @@ from color_detection import detect_color
 
 def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                loops, timeout, updated, console):
-
+    """Implements augmentation and all of the main program functionality"""
 
     # capture frame by frame
     ret, frame = cap.read()
