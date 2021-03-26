@@ -63,7 +63,7 @@ class Variable(Marker):
             loop = True
             # ask the user to input a valid type until they do so
             while loop:
-                self.type = input("Please input a new type: ")
+                self.type = console.get_input("Please input a new type: ")
 
                 if self.type != "string" and self.type != "String" and self.type != "Int" and self.type != "int":
                     self.console.update("ERROR")
@@ -86,7 +86,7 @@ class Variable(Marker):
                 # until they do so
                 while True:
                     try:
-                        self.value = int(input("Please input a new value: "))
+                        self.value = int(console.get_input("Please input a new value: "))
                         loop = False
                     except ValueError:
                         self.console.update("ERROR")
@@ -157,8 +157,6 @@ class Operator(Marker):
     def compute(self, var1, var2=None, value=None):
         """ Carry out an operation """
 
-        #self.console.update(var1.type, type(value))
-
         # it is a value, variable operation
         if (var2 == None):
             # make sure the value given is compatible with numerical operations
@@ -217,7 +215,11 @@ class Loop(Marker):
         file = open("loop_code.py", 'w')
     
         while True:
+<<<<<<< HEAD
             line = self.console.get_input("Write the loop code here: ")
+=======
+            line = self.console.get_input("")
+>>>>>>> 8461c8f3fa22bafb0a195552fdf69f87c0c23927
             if line == "END":
                 break
             else:

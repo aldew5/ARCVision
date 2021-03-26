@@ -106,4 +106,7 @@ def detect_color(image, color):
     
     return False
     
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8461c8f3fa22bafb0a195552fdf69f87c0c23927
