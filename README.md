@@ -1,3 +1,3 @@
-# Science-Fair-2020-2021
+# ARCVision
 
-Code for my Science Fair 2020-2021 project: Augmented Reality applied to a coding educational tool. This project will double as my Higher Level Computer Science IB Internal Assessment.
+Augmented Reality applied to an educational tool that can be used by teachers to teach computer programming. Includes constructs for conditionals, loops, variables and operators. 
