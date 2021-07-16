@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
 from cv2 import aruco
-from augment import *
-from loop_code import run
+from source.utils.augment import *
+from source.loop_code import run
 import time
 
 

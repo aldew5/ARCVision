@@ -1,189 +1,211 @@
-import numpy as np
+import tkinter as tk
+from PIL import Image
+from PIL import ImageTk
+import threading
 import cv2
 from cv2 import aruco
-from augment import *
-from markers import *
-from distance import distance
-from color_detection import detect_color
+from source.utils.frames import get_frames
+from tkinter import scrolledtext
+from source.markers import *
+import keyboard
 
+cap = cv2.VideoCapture(0)
 
-def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
-               loops, timeout, updated, console):
-    """Implements augmentation and all of the main program functionality"""
+aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
+parameters = aruco.DetectorParameters_create()
 
-    # capture frame by frame
-    ret, frame = cap.read()
-    # take the dimensions of the image
-    frame_height, frame_width, frame_channels = frame.shape
+# store a dictionary of detected markers outside the main loop
+# so we can store their values 
+detected = {}
 
-    # covert to grayscale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # detect the markers and frame them
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict,\
-                                                      parameters=parameters)
-    frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
-    img1 = frame
+# inintialize the dictionary
+for i in range(50):
+    detected[i] = False
 
-    # keep a list of the variables and operators currently
-    # in the frame
-    curvar, curops, curloops = [], [], []
-    
-    # we have detected at least one marker
-    if (len(corners)):
-        # create a 1D array of the markers 
-        ids2 = ids.flatten()
+# keep lists of different markers
+variables = {}
+operators = {}
+loops = {}
+
+# keep track of whether or not an operation has been performed
+# and set a timer between them
+timeout = 0
+updated = False
+
+class Console():
+    def __init__(self, x, y, window):
+        self.x = x
+        self.y = y
+        self.cursor = '> '
+        self.window = window
+
+        self.textfield = scrolledtext.ScrolledText(self.window,  
+                                      wrap = tk.WORD,  
+                                      width = 30,  
+                                      height = 27,  
+                                      font = ("Times New Roman", 
+                                              15))
         
-        eindex = -1
-        for id in ids2:
-            # save the index in the corners array
-            # that corresponds to the current id
-            eindex += 1
+    def show(self):
+        """Displays console"""
+        self.textfield.place(relx=self.x, rely=self.y)
+        #self.textfield.insert(tk.INSERT, self.cursor)
 
-            if (id == 1):
-                # start a loop
-                if (not detected[id]):
-                    loop = Loop(id, img1, eindex, frame, corners, frame_width, frame_height, 10, console)
-                    loop.set_code()
-                    loops[id] = loop
-                curloops.append(loops[id])  
-                    
+    def update(self, text):
+        """Updates console text"""
+        self.textfield.insert(tk.INSERT,  "\n" + text)
+
+    def get_text(self):
+        """Retrieves console text"""
+        a = self.textfield.get('1.0', 'end-1c')
+        return a
+
+    def get_input(self, text):
+        """Retrieves user input"""
+        self.textfield.delete('1.0', 'end')
+        self.update(text)
+        # must then wait for enter key to be pressed
+        while True:
+            if keyboard.is_pressed('enter'):
+                break
             
-            elif (id == 2):
-                # declare a new operator
-                if (not detected[id]):
-                    oper = Operator(id, img1, eindex, frame, corners, frame_width, frame_height, console)
-                    operators[id] = oper
-                # update the curops array
-                curops.append(operators[id])
-                    
-            else:
-                # delcare a new varaible 
-                if (not detected[id]):
-                    var = Variable(id, img1, eindex, frame, corners, frame_width, frame_height, console)
-                    variables[id] = var
-                curvar.append(variables[id])
-            detected[id] = True
+        val = self.get_text()
+        ind = len(text) + 1
+
+        
+        self.textfield.delete('1.0', 'end')
+       
+        return val[ind:]
+    
+
+class Menu(tk.Frame):
+    def __init__(self, window):
+        self.window = window
+
+    def show(self):
+        """Displays menu"""
+        title = tk.Label(self.window, text="ARCVision",
+                         anchor="center",
+                         font=("Times New Roman", 20))
+        title.place(relx=0.35, rely=0.3)
+
+        checked = tk.IntVar()
+        box = tk.Checkbutton(self.window, text="Enable descriptors", variable=checked)
+        box.place(relx=0.35, rely=0.4)
+
+        start = tk.Button(self.window,
+                          text="Start Application",
+                          command=self.destroy,
+                          bg="green")
+        start.place(relx=0.35, rely=0.5)
+
+    def destroy(self):
+        """Destorys introductory menu"""
+        self.window.destroy()
+    
         
 
-        # loop through the variables currently in the frame
-        for var in curvar:
-            eindex = -1
-            for id in ids2:
-                eindex += 1
-                # update them with the current parameters
-                if (id == var.id):
-                    var.update(eindex, img1, frame, corners)
-            # augment
-            var.display()
 
-        # udpate the operators in the frame and display them
-        for oper in curops:
-            eindex = -1
-            for id in ids2:
-                eindex += 1
-                if (id == oper.id):
-                    oper.update(eindex, img1, frame, corners)
-            oper.display()
-
-        # update the loop display
-        for loop in curloops:
-            eindex = -1
-            for id in ids2:
-                eindex += 1
-                if (id == loop.id):
-                    loop.update(eindex, img1, frame, corners)
-            loop.display()
-
-
-        # if there is a loop marker on the screen and
-        # the color green, execute the loop
-        if (len(curloops)):
-            if (detect_color(frame, "blue")):
-                updated = False
-                for loop in curloops:
-                    loop.execute()
+class App():
+    def __init__(self, window, vs):
+        self.window = window
+        self.vs = vs
+        self.frames = []
+        self.thread = None
+        self.stopEvent = None
+        self.panel1 = None
+        self.panel2 = None
+        self.console = Console(0.6, 0.15, self.window)
         
+        self.stopEvent = threading.Event()
+        self.thread = threading.Thread(target=self.videoLoop, args=())
+        self.thread.start()
+
+
+    def show(self):
+        """Dislpays app"""
+        title = tk.Label(self.window, text="ARCVision",
+                         anchor="center",
+                         font=("Times New Roman", 20))
+        title.place(relx=0.4, rely=0.05)
+        subtitle = tk.Label(self.window, text="Commands",
+                            font=("Time New Roman", 15))
+        subtitle.place(relx=0.65, rely=0.1)
+
+        self.console.show()
+        #console.update("HI")
+
+       
+        #console.get_text()
+        
+        
+
+
+    def videoLoop(self):
+        """
+            Main video loop that generates and augments
+            the two threads that will be displayed in the
+            panels
+        """
+        try:
+            while not self.stopEvent.is_set():
+                self.frames = get_frames(self.vs, aruco_dict, parameters, detected,
+                                         variables, operators, loops, timeout, updated, self.console)
+                self.frames[0] = cv2.resize(self.frames[0], (300,300))
+                self.frames[1] = cv2.resize(self.frames[1], (300,300))
+
+                # swap the channels becuase openCV uses BGR whereas PIL
+                # uses RGB
+                image1 = cv2.cvtColor(self.frames[0], cv2.COLOR_BGR2RGB)
+                image1 = Image.fromarray(image1)
+                image1 = ImageTk.PhotoImage(image1)
             
-        # check for operation
-        if (len(curops) and len(curvar) and not updated):
-            # confirm the operation with a red object in the frame
-            if (detect_color(frame, "red")):
-                # keep track of variables used in operations
-                # (for multi-variable operations)
-                completed = {}
-                for i in range(50):
-                    completed[i] = False
-                    
-                # 2D list of valid operator variable pairs
-                poss = []
-                # support single variable operations
-                for op in curops:  
-                    tl = corners[op.eindex][0][0]
-                    tr = corners[op.eindex][0][1]
-                    br = corners[op.eindex][0][2]
-                    bl = corners[op.eindex][0][3]
+                image2 = cv2.cvtColor(self.frames[1], cv2.COLOR_BGR2RGB)
+                image2 = Image.fromarray(image2)
+                image2 = ImageTk.PhotoImage(image2)
+
+                # create the panel
+                if self.panel1 is None:
+                    self.panel1 = tk.Label(image=image1)
+                    self.panel1.image = image1
+                    self.panel1.place(relx=0.05, rely=0.15)
+
+                else:
+                    # update the panel
+                    self.panel1.configure(image=image1)
+                    self.panel1.image = image1
+                
+                if self.panel2 is None:
+                    self.panel2 = tk.Label(image=image2)
+                    self.panel2.image = image2
+                    self.panel2.place(relx=0.05, rely=0.55)
+                else:
+                    self.panel2.configure(image=image2)
+                    self.panel2.image = image2
+
+        except RuntimeError:
+            print("[INFO] caught a RuntimeError")
+
         
-                        
-                    for var in curvar:
-                        tl2 = corners[var.eindex][0][0]
-                        tr2 = corners[var.eindex][0][1]
-                        br2 = corners[var.eindex][0][2]
-                        bl2 = corners[var.eindex][0][3]
-                        
-                        # compute the distance between the varaible and the
-                        # marker 
-                        d = distance(tl, tr, br, bl, tl2, tr2, br2, bl2)
 
-                        # if they are close enough add them as a possible
-                        # operation to the poss array
-                        if (d <= 300):
-                            poss.append([var, op])
-                            updated = True
-                
-                # multi-variable operation
-                for i in poss:
-                    for j in poss:
-                        # make sure the varaibles are different and the operators
-                        # are the same
-                        if (i[0].id != j[0].id and i[1].id == j[1].id):
-                            completed[i[0].id] = True
-                            completed[j[0].id] = True
-                            op.compute(i[0], var2=j[0])
-                
-                # single variable operations
-                for i in poss:
-                    if (not completed[i[0].id]):
-                        # request the value that will be used in the computation
-                        value = console.get_input("Please input a value to update " + var.name + " : ")
-
-                        # numerical computation
-                        if (var.type == "int"):
-                            value = int(value)
-                                
-                        op.compute(var, value=value)
-                
-                        
-                        
-                        
-                        
-        
-    # show the different frames
-    #cv2.imshow("augmented", img1)
-    #cv2.imshow("Frame Markers", frame_markers)
-
-    # we completed an operation so update the timeout counter
-    if (updated):
-        timeout += 1
-
-    # if we reach timeout == 50, we can perform another operation
-    if (timeout == 50):
-        updated = False
+# run from the same file
+if (__name__ == "__main__"):
+    window = tk.Tk()
+    window.title("ARCVision")
+    window.geometry("500x500")
     
-    # if we quite
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        return ()
+    menu = Menu(window)
+    menu.show()
+    menu.window.mainloop()
 
-    return [img1, frame_markers]
+    # new window
+    window = tk.Tk()
+
+    window.title("ARCVision")
+    window.geometry("800x800")
     
-
+    app = App(window, cap)
+    
+    app.show()
+    app.window.mainloop()
 
