@@ -248,13 +248,3 @@ class Loop(Marker):
         blank_frame = cv2.resize(blank, (200, 200))
         
         Marker.display(self, blank_frame, self.image)
-        
-
-        
-        
-    
-    
-            
-        
-        
-    
