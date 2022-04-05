@@ -18,7 +18,7 @@ parameters = aruco.DetectorParameters_create()
 # so we can store their values 
 detected = {}
 
-# inintialize the dictionary
+# initialize the dictionary
 for i in range(50):
     detected[i] = False
 
@@ -45,12 +45,11 @@ class Console():
                                       height = 27,  
                                       font = ("Times New Roman", 
                                               15))
-        
+  
     def show(self):
         """Displays console"""
         self.textfield.place(relx=self.x, rely=self.y)
-        #self.textfield.insert(tk.INSERT, self.cursor)
-
+    
     def update(self, text):
         """Updates console text"""
         self.textfield.insert(tk.INSERT,  "\n" + text)
@@ -72,7 +71,6 @@ class Console():
         val = self.get_text()
         ind = len(text) + 1
 
-        
         self.textfield.delete('1.0', 'end')
        
         return val[ind:]
@@ -104,8 +102,6 @@ class Menu(tk.Frame):
         self.window.destroy()
     
         
-
-
 class App():
     def __init__(self, window, vs):
         self.window = window
@@ -121,7 +117,6 @@ class App():
         self.thread = threading.Thread(target=self.videoLoop, args=())
         self.thread.start()
 
-
     def show(self):
         """Dislpays app"""
         title = tk.Label(self.window, text="ARCVision",
@@ -133,13 +128,7 @@ class App():
         subtitle.place(relx=0.65, rely=0.1)
 
         self.console.show()
-        #console.update("HI")
-
-       
-        #console.get_text()
         
-        
-
 
     def videoLoop(self):
         """
@@ -185,8 +174,7 @@ class App():
 
         except RuntimeError:
             print("[INFO] caught a RuntimeError")
-
-        
+      
 
 # run from the same file
 if (__name__ == "__main__"):
@@ -208,4 +196,3 @@ if (__name__ == "__main__"):
     
     app.show()
     app.window.mainloop()
-
