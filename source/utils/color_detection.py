@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-#image = cv2.imread("_data/blue_marker.jpg")
-
 def detect_color(image, color):
     """Detects a specified colour in the frame"""
 
@@ -99,8 +97,6 @@ def detect_color(image, color):
 
                 return True
                 
-          
-        #cv2.imshow("HIGH", image)
     else:
         print("Invalid color")
     
