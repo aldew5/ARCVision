@@ -46,8 +46,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                     loop.set_code()
                     loops[id] = loop
                 curloops.append(loops[id])  
-                    
-            
+                       
             elif (id == 2):
                 # declare a new operator
                 if (not detected[id]):
@@ -64,7 +63,6 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                 curvar.append(variables[id])
             detected[id] = True
         
-
         # loop through the variables currently in the frame
         for var in curvar:
             eindex = -1
@@ -94,7 +92,6 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                     loop.update(eindex, img1, frame, corners)
             loop.display()
 
-
         # if there is a loop marker on the screen and
         # the color green, execute the loop
         if (len(curloops)):
@@ -103,7 +100,6 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                 for loop in curloops:
                     loop.execute()
         
-            
         # check for operation
         if (len(curops) and len(curvar) and not updated):
             # confirm the operation with a red object in the frame
@@ -122,7 +118,6 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                     tr = corners[op.eindex][0][1]
                     br = corners[op.eindex][0][2]
                     bl = corners[op.eindex][0][3]
-        
                         
                     for var in curvar:
                         tl2 = corners[var.eindex][0][0]
@@ -162,14 +157,9 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
                                 
                         op.compute(var, value=value)
                 
-                        
-                        
-                        
-                        
-        
     # show the different frames
-    #cv2.imshow("augmented", img1)
-    #cv2.imshow("Frame Markers", frame_markers)
+    # cv2.imshow("augmented", img1)
+    # cv2.imshow("Frame Markers", frame_markers)
 
     # we completed an operation so update the timeout counter
     if (updated):
@@ -184,6 +174,3 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
         return ()
 
     return [img1, frame_markers]
-    
-
-
