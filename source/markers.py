@@ -118,7 +118,6 @@ class Variable(Marker):
         Marker.display(self, blank_frame, self.image)
         
         
-
     def print(self):
         """ Neat print format """
         self.console.update(self.name, ":", self.value)
@@ -127,8 +126,7 @@ class Variable(Marker):
         """ Setter for value """
         self.value = value 
     
-    
-    
+  
 
 class Operator(Marker):
     """
@@ -182,7 +180,7 @@ class Operator(Marker):
                 self.console.update("Incompatible data types")
 
         # variable, variable operation
-        elif(value == None):
+        elif (value == None):
             # the variables must have the same type
             if (var1.type == var2.type):
                 # complete the operation
@@ -197,8 +195,7 @@ class Operator(Marker):
                 elif (self.oper == '*'):
                     var1.set_value(var1.value * var2.value)
                 elif (self.oper == '/'):
-                    var1.set_value(var1.value / var2.value)
-                    
+                    var1.set_value(var1.value / var2.value)  
             else:
                 self.console.update("ERROR")
                 self.console.update("Incompatible data types")
@@ -242,9 +239,8 @@ class Loop(Marker):
         font = cv2.FONT_HERSHEY_SIMPLEX
         bc = (100, 100)
         
-        cv2.putText(blank, "LOOP", bc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0),\
-                    2)
-        
+        cv2.putText(blank, "LOOP", bc, cv2.FONT_HERSHEY_SIMPLEX, 1,\
+                   (0,0,0), 2)
         blank_frame = cv2.resize(blank, (200, 200))
         
         Marker.display(self, blank_frame, self.image)
