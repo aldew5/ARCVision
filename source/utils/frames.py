@@ -169,7 +169,7 @@ def get_frames(cap, aruco_dict, parameters, detected, variables, operators,
     if (timeout == 50):
         updated = False
     
-    # if we quite
+    # if we quit
     if cv2.waitKey(1) & 0xFF == ord('q'):
         return ()
 
