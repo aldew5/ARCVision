@@ -1,6 +1,6 @@
 # ARCVision
 
-Augmented reality applied to an educational tool that can be used by teachers to teach computer programming. Includes constructs for conditionals, loops, variables and operators. Received a 7 on the HL Computer Science IA.
+Augmented reality applied to an educational tool that can be used by teachers to teach computer programming. Includes constructs for conditionals, loops, variables and operators. 
 
 <img src="https://github.com/aldew5/ARCVision/blob/master/_data/Demo.png" alt="not found" />
 
